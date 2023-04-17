@@ -6,7 +6,7 @@ React Native
 
 ## Sobre
 
-O project **Ignite Gym** é um aplicativo para auxiliar as pessoas a fazer os exercícios de forma correta. Foi o terceiro projeto do curso **Bootcamp Ignite da RocketSeat**.
+O project **Ignite Gym** é um aplicativo para auxiliar as pessoas a fazer os exercícios de forma correta. Foi o terceiro projeto do curso **Bootcamp Ignite da RocketSeat**. Foi adicionado nesse projeto o serviço de Notificações usando OneSignal.
 
 ---
 
@@ -21,6 +21,7 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias
 - React Hook Form
 - Yup
 - React Navigation (Stack e Bottom Tabs)
+- OneSignal
 
 ---
 
@@ -36,9 +37,12 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias
 
   # Instalar as dependências
   $ npm i
+  
+  # Realizar prebuild
+  $ npx expo prebuild
 
   # Iniciar o projeto (usar o Aplicativo Expo no celular pra poder usar)
-  $ npx expo start
+  $ npx expo run:android
 
 ```
 
