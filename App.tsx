@@ -1,21 +1,24 @@
-import { StatusBar } from "react-native";
-import { NativeBaseProvider } from "native-base";
+import { StatusBar } from 'react-native'
+import { NativeBaseProvider } from 'native-base'
+import OneSignal from 'react-native-onesignal'
 import {
   useFonts,
   Roboto_400Regular,
   Roboto_700Bold,
-} from "@expo-google-fonts/roboto";
+} from '@expo-google-fonts/roboto'
 
-import { Loading } from "@components/Loading";
+import { Loading } from '@components/Loading'
 
-import { THEME } from "./src/theme";
+import { THEME } from './src/theme'
 
-import { Routes } from "./src/routes";
+import { Routes } from './src/routes'
 
-import { AuthContextProvider } from "@contexts/AuthContext";
+import { AuthContextProvider } from '@contexts/AuthContext'
+
+OneSignal.setAppId('83a381ce-095a-4413-8939-a64d65966da2')
 
 export default function App() {
-  const [fontsLoaded] = useFonts({ Roboto_400Regular, Roboto_700Bold });
+  const [fontsLoaded] = useFonts({ Roboto_400Regular, Roboto_700Bold })
 
   return (
     <NativeBaseProvider theme={THEME}>
@@ -28,5 +31,5 @@ export default function App() {
         {fontsLoaded ? <Routes /> : <Loading />}
       </AuthContextProvider>
     </NativeBaseProvider>
-  );
+  )
 }
