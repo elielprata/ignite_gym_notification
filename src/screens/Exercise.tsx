@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
 import {
   Box,
   Heading,
@@ -9,98 +9,110 @@ import {
   Text,
   useToast,
   VStack,
-} from "native-base";
-import { TouchableOpacity } from "react-native";
-import { Feather } from "@expo/vector-icons";
-import { useNavigation, useRoute } from "@react-navigation/native";
+} from 'native-base'
+import { TouchableOpacity } from 'react-native'
+import { Feather } from '@expo/vector-icons'
+import { useNavigation, useRoute } from '@react-navigation/native'
 
-import { AppNavigatorRoutesProps } from "@routes/app.routes";
+import { AppNavigatorRoutesProps } from '@routes/app.routes'
 
-import { api } from "@services/api";
-import { AppError } from "@utils/AppErrors";
+import { api } from '@services/api'
+import { AppError } from '@utils/AppErrors'
 
-import BodySvg from "@assets/body.svg";
-import SeriesSvg from "@assets/series.svg";
-import RepetitionsSvg from "@assets/repetitions.svg";
+import BodySvg from '@assets/body.svg'
+import SeriesSvg from '@assets/series.svg'
+import RepetitionsSvg from '@assets/repetitions.svg'
 
-import { Button } from "@components/Button";
+import { Button } from '@components/Button'
 
-import { ExerciseDTO } from "@dtos/ExerciseDTO";
-import { Loading } from "@components/Loading";
+import { ExerciseDTO } from '@dtos/ExerciseDTO'
+import { Loading } from '@components/Loading'
+import { tagHistoryLastWeekUpdate } from 'src/nofications/notificationsTags'
 
 type RouteParamsProps = {
-  exerciseId: string;
-};
+  exerciseId: string
+}
 
 export function Exercise() {
-  const [sendingRegister, setSendingRegister] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [exercise, setExercise] = useState({} as ExerciseDTO);
-  const navigation = useNavigation<AppNavigatorRoutesProps>();
+  const [sendingRegister, setSendingRegister] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [exercise, setExercise] = useState({} as ExerciseDTO)
+  const navigation = useNavigation<AppNavigatorRoutesProps>()
 
-  const route = useRoute();
-  const toast = useToast();
+  const route = useRoute()
+  const toast = useToast()
 
-  const { exerciseId } = route.params as RouteParamsProps;
+  const { exerciseId } = route.params as RouteParamsProps
 
   function handleGoBack() {
-    navigation.goBack();
+    navigation.goBack()
   }
 
   async function fetchExerciseDetails() {
     try {
-      setIsLoading(true);
+      setIsLoading(true)
 
-      const response = await api.get(`/exercises/${exerciseId}`);
-      setExercise(response.data);
+      const response = await api.get(`/exercises/${exerciseId}`)
+      setExercise(response.data)
     } catch (error) {
-      const isAppError = error instanceof AppError;
+      const isAppError = error instanceof AppError
       const title = isAppError
         ? error.message
-        : "Não foi possível carregar os detalhes do exercício.";
+        : 'Não foi possível carregar os detalhes do exercício.'
 
       toast.show({
         title,
-        placement: "top",
-        bgColor: "red.500",
-      });
+        placement: 'top',
+        bgColor: 'red.500',
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
   }
 
   async function handleExerciseHistoryRegister() {
     try {
-      setSendingRegister(true);
+      setSendingRegister(true)
 
-      await api.post(`/history`, { exercise_id: exerciseId });
+      await api.post(`/history`, { exercise_id: exerciseId })
 
       toast.show({
-        title: "Parabéns! Exercício registrado no seu histórico.",
-        placement: "top",
-        bgColor: "green.500",
-      });
+        title: 'Parabéns! Exercício registrado no seu histórico.',
+        placement: 'top',
+        bgColor: 'green.500',
+      })
 
-      navigation.navigate("history");
+      const history = await api.get(`/history`)
+
+      const countExercises = history.data.reduce((acc: number, curr: any) => {
+        acc += curr.data.length
+        return acc
+      }, 0)
+
+      console.log(countExercises)
+
+      //tagHistoryLastWeekUpdate(countExercises)
+
+      navigation.navigate('history')
     } catch (error) {
-      const isAppError = error instanceof AppError;
+      const isAppError = error instanceof AppError
       const title = isAppError
         ? error.message
-        : "Não foi possível registrar o exercício.";
+        : 'Não foi possível registrar o exercício.'
 
       toast.show({
         title,
-        placement: "top",
-        bgColor: "red.500",
-      });
+        placement: 'top',
+        bgColor: 'red.500',
+      })
     } finally {
-      setSendingRegister(false);
+      setSendingRegister(false)
     }
   }
 
   useEffect(() => {
-    fetchExerciseDetails();
-  }, [exerciseId]);
+    fetchExerciseDetails()
+  }, [exerciseId])
 
   return (
     <VStack flex={1}>
@@ -185,5 +197,5 @@ export function Exercise() {
         </ScrollView>
       )}
     </VStack>
-  );
+  )
 }

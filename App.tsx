@@ -17,6 +17,8 @@ import { AuthContextProvider } from '@contexts/AuthContext'
 
 OneSignal.setAppId('83a381ce-095a-4413-8939-a64d65966da2')
 
+OneSignal.promptForPushNotificationsWithUserResponse((res) => console.log(res))
+
 export default function App() {
   const [fontsLoaded] = useFonts({ Roboto_400Regular, Roboto_700Bold })
 

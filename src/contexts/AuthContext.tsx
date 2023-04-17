@@ -1,45 +1,45 @@
-import { createContext, ReactNode, useEffect, useState } from "react";
+import { createContext, ReactNode, useEffect, useState } from 'react'
 
-import { UserDTO } from "@dtos/UserDTO";
+import { UserDTO } from '@dtos/UserDTO'
 
-import { api } from "@services/api";
+import { api } from '@services/api'
 
 import {
   storageAuthTokenGet,
   storageAuthTokenRemove,
   storageAuthTokenSave,
-} from "@storage/StorageAuthToken";
+} from '@storage/StorageAuthToken'
 import {
   storageUserGet,
   storageUserRemove,
   storageUserSave,
-} from "@storage/StorageUser";
+} from '@storage/StorageUser'
+import OneSignal from 'react-native-onesignal'
 
 export type AuthContextDataProps = {
-  user: UserDTO;
-  signIn: (email: string, password: string) => Promise<void>;
-  signOut: () => Promise<void>;
-  updateUserProfile: (userUpdated: UserDTO) => void;
-  isLoadingUserStorageData: boolean;
-};
+  user: UserDTO
+  signIn: (email: string, password: string) => Promise<void>
+  signOut: () => Promise<void>
+  updateUserProfile: (userUpdated: UserDTO) => void
+  isLoadingUserStorageData: boolean
+}
 
 type AuthContextProviderProps = {
-  children: ReactNode;
-};
+  children: ReactNode
+}
 
 export const AuthContext = createContext<AuthContextDataProps>(
   {} as AuthContextDataProps
-);
+)
 
 export function AuthContextProvider({ children }: AuthContextProviderProps) {
-  const [user, setUser] = useState({} as UserDTO);
-  const [isLoadingUserStorageData, setIsLoadingUserStorageData] =
-    useState(true);
+  const [user, setUser] = useState({} as UserDTO)
+  const [isLoadingUserStorageData, setIsLoadingUserStorageData] = useState(true)
 
   async function userAndTokenUpdate(user: UserDTO, token: string) {
-    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
-    setUser(user);
+    setUser(user)
   }
 
   async function storageUserAndTokenSave(
@@ -48,88 +48,86 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     refresh_token: string
   ) {
     try {
-      setIsLoadingUserStorageData(true);
+      setIsLoadingUserStorageData(true)
 
-      await storageUserSave(user);
-      await storageAuthTokenSave({ token, refresh_token });
+      await storageUserSave(user)
+      await storageAuthTokenSave({ token, refresh_token })
     } catch (error) {
-      throw error;
+      throw error
     } finally {
-      setIsLoadingUserStorageData(false);
+      setIsLoadingUserStorageData(false)
     }
   }
 
   async function signIn(email: string, password: string) {
     try {
-      const { data } = await api.post("/sessions", { email, password });
+      const { data } = await api.post('/sessions', { email, password })
 
       if (data.user && data.token && data.refresh_token) {
-        await storageUserAndTokenSave(
-          data.user,
-          data.token,
-          data.refresh_token
-        );
+        await storageUserAndTokenSave(data.user, data.token, data.refresh_token)
 
-        userAndTokenUpdate(data.user, data.token);
+        userAndTokenUpdate(data.user, data.token)
+        OneSignal.sendTag('isLogged', 'true')
       }
     } catch (error) {
-      throw error;
+      throw error
     } finally {
-      setIsLoadingUserStorageData(false);
+      setIsLoadingUserStorageData(false)
     }
   }
 
   async function signOut() {
     try {
-      setIsLoadingUserStorageData(true);
+      setIsLoadingUserStorageData(true)
 
-      setUser({} as UserDTO);
-      await storageUserRemove();
-      await storageAuthTokenRemove();
+      setUser({} as UserDTO)
+      await storageUserRemove()
+      await storageAuthTokenRemove()
+      OneSignal.deleteTag('isLogged')
     } catch (error) {
-      throw error;
+      throw error
     } finally {
-      setIsLoadingUserStorageData(false);
+      setIsLoadingUserStorageData(false)
     }
   }
 
   async function updateUserProfile(userUpdated: UserDTO) {
     try {
-      setUser(userUpdated);
-      await storageUserSave(userUpdated);
+      setUser(userUpdated)
+      await storageUserSave(userUpdated)
     } catch (error) {
-      throw error;
+      throw error
     }
   }
 
   async function loadUserData() {
     try {
-      setIsLoadingUserStorageData(true);
+      setIsLoadingUserStorageData(true)
 
-      const userLogged = await storageUserGet();
-      const { token } = await storageAuthTokenGet();
+      const userLogged = await storageUserGet()
+      const { token } = await storageAuthTokenGet()
 
       if (token && userLogged) {
-        userAndTokenUpdate(userLogged, token);
+        userAndTokenUpdate(userLogged, token)
       }
     } catch (error) {
-      throw error;
+      throw error
     } finally {
-      setIsLoadingUserStorageData(false);
+      setIsLoadingUserStorageData(false)
     }
   }
 
   useEffect(() => {
-    loadUserData();
-  }, []);
+    loadUserData()
+  }, [])
 
   useEffect(() => {
-    const subscribe = api.registerInterceptTokenManager(signOut);
+    const subscribe = api.registerInterceptTokenManager(signOut)
 
     return () => {
-      subscribe();
-    };
-  }, [signOut]);
+      subscribe()
+    }
+  }, [signOut])
 
   return (
     <AuthContext.Provider
@@ -143,5 +141,5 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     >
       {children}
     </AuthContext.Provider>
-  );
+  )
 }

@@ -1,34 +1,36 @@
-import { Platform } from "react-native";
-import { useTheme } from "native-base";
+import { Platform } from 'react-native'
+import { useTheme } from 'native-base'
 import {
   BottomTabNavigationProp,
   createBottomTabNavigator,
-} from "@react-navigation/bottom-tabs";
+} from '@react-navigation/bottom-tabs'
 
-import HomeSvg from "@assets/home.svg";
-import HistorySvg from "@assets/history.svg";
-import ProfileSvg from "@assets/profile.svg";
+import HomeSvg from '@assets/home.svg'
+import HistorySvg from '@assets/history.svg'
+import ProfileSvg from '@assets/profile.svg'
 
-import { Home } from "@screens/Home";
-import { History } from "@screens/History";
-import { Profile } from "@screens/Profile";
-import { Exercise } from "@screens/Exercise";
+import { Home } from '@screens/Home'
+import { History } from '@screens/History'
+import { Profile } from '@screens/Profile'
+import { Exercise } from '@screens/Exercise'
+import { NotFoundScreen } from '@screens/NotFound'
 
 type AppRoutes = {
-  home: undefined;
-  exercise: { exerciseId: string };
-  profile: undefined;
-  history: undefined;
-};
+  home: undefined
+  exercise: { exerciseId: string }
+  profile: undefined
+  history: undefined
+  notFound: undefined
+}
 
-export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRoutes>;
+export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRoutes>
 
-const { Navigator, Screen } = createBottomTabNavigator<AppRoutes>();
+const { Navigator, Screen } = createBottomTabNavigator<AppRoutes>()
 
 export function AppRoutes() {
-  const { sizes, colors } = useTheme();
+  const { sizes, colors } = useTheme()
 
-  const IconSize = sizes[6];
+  const IconSize = sizes[6]
 
   return (
     <Navigator
@@ -40,7 +42,7 @@ export function AppRoutes() {
         tabBarStyle: {
           backgroundColor: colors.gray[600],
           borderTopWidth: 0,
-          height: Platform.OS === "android" ? "auto" : 96,
+          height: Platform.OS === 'android' ? 'auto' : 96,
           paddingBottom: sizes[10],
           paddingTop: sizes[6],
         },
@@ -81,6 +83,12 @@ export function AppRoutes() {
         component={Exercise}
         options={{ tabBarButton: () => null }}
       />
+
+      <Screen
+        name="notFound"
+        component={NotFoundScreen}
+        options={{ tabBarButton: () => null }}
+      />
     </Navigator>
-  );
+  )
 }
