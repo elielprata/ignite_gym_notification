@@ -15,7 +15,7 @@ import { Routes } from './src/routes'
 
 import { AuthContextProvider } from '@contexts/AuthContext'
 
-OneSignal.setAppId('83a381ce-095a-4413-8939-a64d65966da2')
+OneSignal.setAppId('')
 
 OneSignal.promptForPushNotificationsWithUserResponse((res) => console.log(res))
 
